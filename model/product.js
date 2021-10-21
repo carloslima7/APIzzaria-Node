@@ -42,14 +42,6 @@ const ProductSchema = new Schema({
     createUser: {
         type: String,
         require: true
-    },
-    updateAt: {
-        type: Date,
-        default: Date.now
-    },
-    updateUser: {
-        type: String,
-        require: true
     }
 }
 )
