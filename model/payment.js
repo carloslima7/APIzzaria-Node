@@ -1,14 +1,14 @@
-const mongoose = require('mongoose')
+const mongoose = require('../database')
 
-const PaymentSchema = new Schema({
+const PaymentSchema = new mongoose.Schema({
     paymentCode: {
         type: String,
-        require: true,
+        required: true,
         unique: true
     },
     paymentName: {
         type: String,
-        require: true
+        required: true
     },
     paymentTax: {
         type: Number,

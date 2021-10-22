@@ -1,70 +1,70 @@
-const mongoose = require('mongoose')
+const mongoose = require('../database')
 
-const OrderSchema = new Schema({
+const OrderSchema = new mongoose.Schema({
     order: {
         type: Number,
-        require: true,
+        required: true,
         unique: true
     },
     customerCode: {
         type: String,
-        require: true
+        required: true
     },
     customer: {
         type: String,
-        require: true
+        required: true
     },
     items: {
         itemCode: {
             type: String,
-            require: true
+            required: true
         },
         itemName: {
             type: String,
-            require: true
+            required: true
         },
         quantity: {
             type: Number,
-            require: true
+            required: true
         },
         price: {
             type: Number,
-            require: true,
+            required: true,
             default: 0.00
         },
         cost: {
             type: Number,
-            require: true,
+            required: true,
             default: 0.00
         }
     },
     deliveryTax: {
         type: Number,
-        require: true,
+        required: true,
         default: 0.00
     },
     payment: {
         type: Number,
-        require: true
+        required: true
     },
     paymentTax: {
         type: Number,
-        require: true,
+        required: true,
         default: 0.00
     },
     totalItens: {
         type: Number,
-        require: true,
+        required: true,
         default: 0.00
     },
     docTotal: {
         type: Number,
-        require: true,
+        required: true,
         default: 0.00
     },
     finished: {
         type: String,
-        require: true,
+        required: true,
         default: 'N'
     }
 })

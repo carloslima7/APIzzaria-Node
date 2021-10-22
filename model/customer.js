@@ -1,44 +1,44 @@
-const mongoose = require('mongoose')
+const mongoose = require('../database')
 
-const CustomerShcema = new Schema({
+const CustomerShcema = new mongoose.Schema({
     customerCode: {
         type: String,
-        require: true,
+        required: true,
         unique: true
     },
     customer: {
         type: String,
-        require: true
+        required: true
     },
     phone: {
         type: String,
-        require: true
+        required: true
     },
     address: {
         street: {
             type: String,
-            require: true
+            required: true
         },
         streetNo: {
             type: String,
-            require: true
+            required: true
         },
         building: String,
         block: {
             type: String,
-            require: true
+            required: true
         },
         city: {
             type: String,
-            require: true
+            required: true
         },
         state: {
             type: String,
-            require: true
+            required: true
         },
         zipCode: {
             type: String,
-            require: true
+            required: true
         },
         reference: String
 

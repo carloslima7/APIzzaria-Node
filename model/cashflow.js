@@ -1,6 +1,6 @@
-const mongoose = require('mongoose')
+const mongoose = require('../database')
 
-const CashFlowSchema = new Schema({
+const CashFlowSchema = new mongoose.Schema({
     cashIn: {
         order: Number,
         date: Date,

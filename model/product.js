@@ -1,19 +1,19 @@
-const mongoose = require('mongoose')
+const mongoose = require('../database')
 
-const ProductSchema = new Schema({
+const ProductSchema = new mongoose.Schema({
     itemCode: {
         type: String,
-        require: true,
+        required: true,
         unique: true,
         uppercase: true
     },
     itemName: {
         type: String,
-        require: true
+        required: true
     },
     type: {
         type: String,
-        require: true
+        required: true
     },
     price: {
         type: Number,
@@ -41,7 +41,7 @@ const ProductSchema = new Schema({
     },
     createUser: {
         type: String,
-        require: true
+        required: true
     }
 }
 )

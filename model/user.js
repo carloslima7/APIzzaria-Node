@@ -1,27 +1,31 @@
-const mongoose = require('mongoose')
+const mongoose = require('../database')
+const bcrypt = require('bcrypt')
 
-const UserSchema = new Schema({
+const UserSchema = new mongoose.Schema({
     login: {
         type: String,
-        require: true,
-        unique: true
+        required: true,
+        unique: true,
     },
     password: {
         type: String,
-        require: true,
-        select: false
+        required: true,
+        select: false,
     },
     email: {
         type: String,
-        require: true,
-        unique: true
+        required: true,
+        unique: true,
     },
     fullName: {
         type: String,
-        require: true
+        required: true,
     },
     forgotToken: String,
-    expirationToken: Date
+    expirationToken: {
+        type: Date,
+        default: Date.now
+    }
 })
 
 const User = mongoose.model('User', UserSchema)
