@@ -20,10 +20,13 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    forgotToken: String,
+    forgotToken: {
+        type: String,
+        select: false
+    },
     expirationToken: {
         type: Date,
-        default: Date.now
+        select: false
     }
 })
 
