@@ -14,7 +14,7 @@ const OrderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    items: {
+    items: [{
         itemCode: {
             type: String,
             required: true
@@ -36,8 +36,13 @@ const OrderSchema = new mongoose.Schema({
             type: Number,
             required: true,
             default: 0.00
+        },
+        pricetotal: {
+            type: Number,
+            required: true,
+            default: 0.00
         }
-    },
+    }],
     deliveryTax: {
         type: Number,
         required: true,

@@ -28,19 +28,25 @@ const ProductSchema = new mongoose.Schema({
         default: 0.00
     },
     feedStock: {
-        feedCode: String,
-        feedName: String,
-        cost: {
-            type: Number,
-            default: 0.00
-        }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
     },
+    // Caso feedstock acima nao funcione
+    // [{     
+    //     feedCode: String,
+    //     feedName: String,
+    //     cost: {
+    //         type: Number,
+    //         default: 0.00
+    //     }
+    // }],
     createAt: {
         type: Date,
         default: Date.now
     },
     createUser: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     }
 }

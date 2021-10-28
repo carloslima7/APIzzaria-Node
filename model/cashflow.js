@@ -1,17 +1,21 @@
 const mongoose = require('../database')
 
 const CashFlowSchema = new mongoose.Schema({
-    cashIn: {
+    cashIn: [{
         order: Number,
         date: Date,
         total: Number,
         reconciled: String,
-    },
-    cashOut: {
+    }],
+    cashOut: [{
         order: Number,
         date: Date,
         total: Number,
         reconciled: String
+    }],
+    createAt: {
+        type: Date,
+        default: Date.now
     },
     total: Number
 })

@@ -5,13 +5,10 @@
   "main": "index.js",
   "dependencies": {
     "bcrypt": "^5.0.1",
-    "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
-    "fs": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.11",
-    "nodemon": "^2.0.14",
-    "path": "^0.12.7"
+    "nodemon": "^2.0.14"
   },
   "devDependencies": {},
   "scripts": {
