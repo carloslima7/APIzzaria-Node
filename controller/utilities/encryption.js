@@ -1,9 +1,11 @@
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt")
 
-module.exports = (password) => {
-    return bcrypt.hash(password, 10)
+const encrypt = (password) => {
+  return bcrypt.hash(password, 10)
 }
 
-module.exports = (password, passwordTyped) => {
-    return bcrypt.compare(password, passwordTyped)
+const compare = (password, passwordTyped) => {
+  return bcrypt.compare(password, passwordTyped)
 }
+
+module.exports = { encrypt, compare }

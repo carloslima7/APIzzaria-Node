@@ -12,17 +12,15 @@ router.post("/register", async (req, res) => {
   const { login } = req.body
 
   try {
-    if (await User.findOne({ login })) {
+    if (await User.findOne({ login }, "-__v -expirationToken -forgotToken")) {
       return res.status(400).send({ error: "Login Already exists" })
     }
 
-    req.body.password = await encryption(req.body.password)
+    req.body.password = await encryption.encrypt(req.body.password)
 
     const user = await User.create(req.body)
 
     user.password = undefined
-    user.expirationToken = undefined
-    user.__v = undefined
 
     return res.send({ user, token: generateJWT({ id: user.id }) })
   } catch (err) {
@@ -33,19 +31,20 @@ router.post("/register", async (req, res) => {
 router.post("/authenticate", async (req, res) => {
   const { login, password } = req.body
 
-  const user = await User.findOne({ login }).select("+password")
+  const user = await User.findOne(
+    { login },
+    "-__v -expirationToken -forgotToken"
+  ).select("+password")
 
   if (!user) {
     return res.status(400).send({ error: "Login not found" })
   }
 
-  if (!(await encryption(password, user.password))) {
+  if (!(await encryption.compare(password, user.password))) {
     return res.status(400).send({ error: "Invalid password" })
   }
 
   user.password = undefined
-  user.__v = undefined
-  user.expirationToken = undefined
 
   res.send({ user, token: generateJWT({ id: user.id }) })
 })
@@ -97,13 +96,13 @@ router.post("/resetpassword", async (req, res) => {
         .send({ error: "Key expired, generate a new key again" })
     }
 
-    user.password = await encryption(password)
+    user.password = await encryption.encrypt(password)
     user.forgotToken = undefined
 
     await user.save()
     res.send({ message: "Password changed" })
   } catch (err) {
-    res.status(400).send({ error: "Cannot reset password, try again" + err })
+    res.status(400).send({ error: "Cannot reset password, try again" })
   }
 })
 
