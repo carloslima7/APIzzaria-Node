@@ -1,9 +1,9 @@
 const express = require("express")
 const router = express.Router()
-const middleware = require("../middleware/authenticated")
+const authenticatedMiddleware = require("../middleware/authenticated")
 const Payment = require("../model/payment")
 
-router.use(middleware)
+router.use(authenticatedMiddleware)
 
 router.get("/", async (req, res) => {
   try {
@@ -27,7 +27,8 @@ router.get("/:paymentCode", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { paymentCode } = req.body
-    if (await Payment.findOne({ paymentCode })) {
+    const paymentFind = await Payment.findOne({ paymentCode })
+    if (paymentFind) {
       return res.status(400).send({ error: "Payment already exists" })
     }
     const payment = await Payment.create(req.body)
@@ -41,8 +42,8 @@ router.put("/:paymentCode", async (req, res) => {
   try {
     const { paymentName, paymentTax } = req.body
     const paymentCode = req.params.paymentCode
-
-    if (!(await Payment.findOne({ paymentCode }))) {
+    const paymentFind = await Payment.findOne({ paymentCode })
+    if (!paymentFind) {
       return res.status(400).send({ error: "Payment not exist" })
     }
     const payment = await Payment.findOneAndUpdate(
@@ -59,12 +60,12 @@ router.put("/:paymentCode", async (req, res) => {
 router.delete("/:paymentCode", async (req, res) => {
   try {
     const paymentCode = req.params.paymentCode
-
-    if (!(await Payment.findOne({ paymentCode }))) {
+    const paymentFind = await Payment.findOne({ paymentCode })
+    if (!paymentFind) {
       return res.status(400).send({ error: "Payment not exist" })
     }
 
-    await Payment.findOneAndDelete({ paymentCode })
+    const paymentDelete = await Payment.findOneAndDelete({ paymentCode })
     return res.send({ message: "Register deleted" })
   } catch (err) {
     return res.status(400).send({ error: "Delete failed, try again" })

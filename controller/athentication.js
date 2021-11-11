@@ -106,10 +106,29 @@ router.post("/resetpassword", async (req, res) => {
   }
 })
 
-router.get("/", async (req, res) => {
+router.get("/:limit/:page", async (req, res) => {
   try {
+    const limit = parseInt(req.params.limit, 10)
+    const page = parseInt(req.params.page, 10)
+    const numberOfUsers = await User.find().count()
+    const factor = Math.ceil(numberOfUsers / limit)
+    const skip = limit * (page - 1)
+
+    if (page > factor || page < 1) {
+      return res.status(400).send({ error: "Page not exist" })
+    }
+
     const user = await User.find({}, "-__v -expirationToken -forgotToken")
-    return res.send({ user })
+      .sort({ login: 1 })
+      .skip(skip)
+      .limit(limit)
+
+    return res.send({
+      user,
+      pages: factor,
+      actualyPage: page,
+      limitPerPage: limit,
+    })
   } catch (err) {
     return res.status(400).send({ error: "Search Failed, try again" })
   }
