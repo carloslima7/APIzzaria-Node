@@ -118,16 +118,15 @@ router.get("/:limit/:page", async (req, res) => {
       return res.status(400).send({ error: "Page not exist" })
     }
 
-    const user = await User.find({}, "-__v -expirationToken -forgotToken")
+    const users = await User.find({}, "-__v -expirationToken -forgotToken")
       .sort({ login: 1 })
       .skip(skip)
       .limit(limit)
 
     return res.send({
-      user,
+      users,
       pages: factor,
-      actualyPage: page,
-      limitPerPage: limit,
+      totalRecords: numberOfUsers,
     })
   } catch (err) {
     return res.status(400).send({ error: "Search Failed, try again" })

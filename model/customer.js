@@ -20,7 +20,7 @@ const CustomerShcema = new mongoose.Schema({
       required: true,
     },
     streetNo: {
-      type: String,
+      type: Number,
       required: true,
     },
     building: String,

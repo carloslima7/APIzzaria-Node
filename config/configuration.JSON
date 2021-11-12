@@ -1,5 +1,6 @@
 {
   "server": "localhost",
+  "base": "APIzzaria",
   "port": "3000",
   "secret": "APIzzaria"
 }

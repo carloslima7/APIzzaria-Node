@@ -27,8 +27,8 @@ router.get("/:paymentCode", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const { paymentCode } = req.body
-    const paymentFind = await Payment.findOne({ paymentCode })
-    if (paymentFind) {
+    const findPayment = await Payment.findOne({ paymentCode })
+    if (findPayment) {
       return res.status(400).send({ error: "Payment already exists" })
     }
     const payment = await Payment.create(req.body)
@@ -42,8 +42,8 @@ router.put("/:paymentCode", async (req, res) => {
   try {
     const { paymentName, paymentTax } = req.body
     const paymentCode = req.params.paymentCode
-    const paymentFind = await Payment.findOne({ paymentCode })
-    if (!paymentFind) {
+    const findPayment = await Payment.findOne({ paymentCode })
+    if (!findPayment) {
       return res.status(400).send({ error: "Payment not exist" })
     }
     const payment = await Payment.findOneAndUpdate(
@@ -60,12 +60,12 @@ router.put("/:paymentCode", async (req, res) => {
 router.delete("/:paymentCode", async (req, res) => {
   try {
     const paymentCode = req.params.paymentCode
-    const paymentFind = await Payment.findOne({ paymentCode })
-    if (!paymentFind) {
+    const findPayment = await Payment.findOne({ paymentCode })
+    if (!findPayment) {
       return res.status(400).send({ error: "Payment not exist" })
     }
 
-    const paymentDelete = await Payment.findOneAndDelete({ paymentCode })
+    const deletePayment = await Payment.findOneAndDelete({ paymentCode })
     return res.send({ message: "Register deleted" })
   } catch (err) {
     return res.status(400).send({ error: "Delete failed, try again" })
