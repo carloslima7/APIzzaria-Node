@@ -1,7 +1,7 @@
 const mongoose = require("../database")
 
 const OrderSchema = new mongoose.Schema({
-  order: {
+  orderCode: {
     type: Number,
     required: true,
     unique: true,
@@ -20,17 +20,17 @@ const OrderSchema = new mongoose.Schema({
         type: Number,
         required: true,
       },
-      price: {
+      priceOrder: {
         type: Number,
         required: true,
         default: 0.0,
       },
-      cost: {
+      costOrder: {
         type: Number,
         required: true,
         default: 0.0,
       },
-      pricetotal: {
+      priceTotal: {
         type: Number,
         required: true,
         default: 0.0,
@@ -43,13 +43,8 @@ const OrderSchema = new mongoose.Schema({
     default: 0.0,
   },
   payment: {
-    type: Number,
-    required: true,
-  },
-  paymentTax: {
-    type: Number,
-    required: true,
-    default: 0.0,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Payment",
   },
   totalItens: {
     type: Number,

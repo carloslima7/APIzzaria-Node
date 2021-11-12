@@ -4,7 +4,6 @@ const CashFlowSchema = new mongoose.Schema({
   cashIn: [
     {
       order: Number,
-      date: Date,
       total: Number,
       reconciled: String,
     },
@@ -12,7 +11,6 @@ const CashFlowSchema = new mongoose.Schema({
   cashOut: [
     {
       order: Number,
-      date: Date,
       total: Number,
       reconciled: String,
     },
