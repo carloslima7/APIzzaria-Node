@@ -5,10 +5,24 @@ const Payment = require("../model/payment")
 
 router.use(authenticatedMiddleware)
 
-router.get("/", async (req, res) => {
+router.get("/:limit/:page", async (req, res) => {
   try {
-    const payment = await Payment.find({})
-    return res.send({ payment })
+    const limit = parseInt(req.params.limit, 10)
+    const page = parseInt(req.params.page, 10)
+    const numberOfPayments = await Payment.find().count()
+    const factor = Math.ceil(numberOfPayments / limit)
+    const skip = limit * (page - 1)
+
+    if (page > factor || page < 1) {
+      return res.status(400).send({ error: "Page not exist" })
+    }
+
+    const payments = await Payment.find({})
+      .sort({ login: 1 })
+      .skip(skip)
+      .limit(limit)
+
+    return res.send({ payments, pages: factor, totalRecords: numberOfPayments })
   } catch (err) {
     return res.status(400).send({ error: "Search Failed, try again" })
   }

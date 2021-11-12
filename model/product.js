@@ -11,10 +11,6 @@ const ProductSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  type: {
-    type: String,
-    required: true,
-  },
   price: {
     type: Number,
     default: 0.0,
@@ -31,15 +27,6 @@ const ProductSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
   },
-  // Caso feedstock acima nao funcione
-  // [{
-  //     feedCode: String,
-  //     feedName: String,
-  //     cost: {
-  //         type: Number,
-  //         default: 0.00
-  //     }
-  // }],
   createAt: {
     type: Date,
     default: Date.now,
