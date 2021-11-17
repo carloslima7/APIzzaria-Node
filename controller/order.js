@@ -4,9 +4,10 @@ const authenticatedMiddleware = require("../middleware/authenticated")
 const Order = require("../model/order")
 const Payment = require("../model/payment")
 const Product = require("../model/product")
+const CashFlow = require("../model/cashflow")
 
 router.use(authenticatedMiddleware)
-//feito
+
 router.get("/:limit/:page", async (req, res) => {
   try {
     const limit = parseInt(req.params.limit, 10)
@@ -36,7 +37,7 @@ router.get("/:limit/:page", async (req, res) => {
     return res.status(400).send({ error: "Search Failed, try again" + err })
   }
 })
-//feito
+
 router.get("/:orderCode", async (req, res) => {
   try {
     const orderCode = req.params.orderCode
@@ -49,31 +50,45 @@ router.get("/:orderCode", async (req, res) => {
     return res.status(400).send({ error: "Search failed, try again" })
   }
 })
-//Ajusta campos de custo
+
 router.post("/", async (req, res) => {
   try {
-    const { orderCode, payment, items } = req.body
-    const { itemCode } = items
+    const { orderCode, payment, items, deliveryTax } = req.body
     const findOrder = await Order.findOne({ orderCode })
     const findPayment = await Payment.findOne({ payment })
-    const findProduct = await Product.findOne({ itemCode })
+
     if (findOrder) {
       return res.status(400).send({ error: "Order already exist" })
     }
     if (!findPayment) {
       return res.status(400).send({ error: "Payment not exist" })
     }
-    if (!findProduct) {
-      return res.status(400).send({ error: `Product ${itemCode} not exist` })
+
+    let countItems = 0
+    let totalItens = 0
+    for (let itemsArray of items) {
+      const id = itemsArray.itemCode
+      const quantity = itemsArray.quantity
+      const findProduct = await Product.findOne({ id }).select(
+        "price cost stock"
+      )
+      const stock = findProduct.stock - quantity
+      const updateStock = await Product.findOneAndUpdate(
+        { id },
+        { stock },
+        { new: true }
+      )
+      req.body.items[countItems].priceOrder = findProduct.price
+      req.body.items[countItems].costOrder = findProduct.cost
+      req.body.items[countItems].priceTotal = quantity * findProduct.price
+      totalItens += quantity * findProduct.price - quantity * findProduct.cost
+      countItems++
     }
 
-    //validações e ajustes de gravação
-    const { price, cost, stock, itemCode } = findProduct
     const { paymentTax } = findPayment
-    req.body.docTotal = 0
-    req.body.docTotal += paymentTax
+    req.body.totalItens = totalItens
+    req.body.docTotal = totalItens + paymentTax + deliveryTax
 
-    //grava
     const order = await Order.create(req.body)
     return res.send({ order })
   } catch (err) {
@@ -81,47 +96,35 @@ router.post("/", async (req, res) => {
   }
 })
 
-router.put("/:customerCode", async (req, res) => {
+router.put("/:orderCode", async (req, res) => {
   try {
-    const {
-      customerName,
-      phone,
-      address,
-      streetNo,
-      building,
-      block,
-      city,
-      state,
-      zipCode,
-      reference,
-    } = req.body
-    const customerCode = req.params.customerCode
-    const findCustomer = await Customer.findOne({ customerCode })
-    if (!findCustomer) {
-      return res.status(400).send({ error: "Customer not exist" })
-    }
-    const customer = await Customer.findOneAndUpdate(
-      { customerCode },
-      {
-        customerName,
-        phone,
-        address,
-        streetNo,
-        building,
-        block,
-        city,
-        state,
-        zipCode,
-        reference,
-      },
+    const orderCode = req.params.orderCode
+    const { finished } = req.body
+    const finishOrder = await Order.findOneAndUpdate(
+      { orderCode },
+      { finished },
       { new: true }
     )
-    return res.send({ customer })
+    if (finishOrder) {
+      const docTotal = finishOrder.docTotal
+      const firstFlow = await CashFlow({})
+      if (!firstFlow.length) {
+        const cashflow = await CashFlow.create({ lucroTotal: docTotal })
+      } else {
+        const cashflow = await CashFlow.update(
+          {},
+          { lucroTotal: docTotal },
+          { new: true }
+        )
+      }
+    }
+
+    return res.send({ message: `Order ${orderCode} finished` })
   } catch (err) {
-    return res.status(400).send({ error: "Update failed, try again" })
+    return res.status(400).send({ error: "Update failed, try again" + err })
   }
 })
-//Ajustar baixa de estoque
+
 router.delete("/:orderCode", async (req, res) => {
   try {
     const orderCode = req.params.orderCode
@@ -129,11 +132,26 @@ router.delete("/:orderCode", async (req, res) => {
     if (!findOrder) {
       return res.status(400).send({ error: "Order not exist" })
     }
+    if (findOrder.finished !== "N") {
+      return res.status(400).send({ error: "Order finished cannot be deleted" })
+    }
+
+    for (items of findOrder.items) {
+      const { itemCode, quantity } = items
+      const findItem = await Product.findOne({ id: itemCode }).select("stock")
+      const stock = findItem.stock + quantity
+      const lowStock = await Product.findOneAndUpdate(
+        { id: itemCode },
+        { stock },
+        { new: true }
+      )
+    }
 
     const deleteOrder = await Order.findOneAndDelete({ orderCode })
+
     return res.send({ message: "Register deleted" })
   } catch (err) {
-    return res.status(400).send({ error: "Delete failed, try again" })
+    return res.status(400).send({ error: "Delete failed, try again" + err })
   }
 })
 
