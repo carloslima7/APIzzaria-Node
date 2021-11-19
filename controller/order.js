@@ -100,23 +100,35 @@ router.put("/:orderCode", async (req, res) => {
   try {
     const orderCode = req.params.orderCode
     const { finished } = req.body
+    const validOrder = await Order.find({ orderCode, finished: "S" })
+    if (validOrder) {
+      return res.status(400).send({ error: "Order already finished" })
+    }
+
     const finishOrder = await Order.findOneAndUpdate(
       { orderCode },
       { finished },
       { new: true }
     )
+
     if (finishOrder) {
       const docTotal = finishOrder.docTotal
-      const firstFlow = await CashFlow({})
-      if (!firstFlow.length) {
-        const cashflow = await CashFlow.create({ lucroTotal: docTotal })
-      } else {
-        const cashflow = await CashFlow.update(
-          {},
-          { lucroTotal: docTotal },
-          { new: true }
-        )
+      let lucroTotal = docTotal
+      const today = new Date()
+      const date = `${today.getFullYear()}${
+        today.getMonth() + 1
+      }${today.getDate()}`
+
+      const findFlow = await CashFlow.findOne({ date })
+      if (findFlow) {
+        lucroTotal += findFlow.lucroTotal
       }
+
+      const cashflow = await CashFlow.updateOne(
+        { date },
+        { $push: { orders: { orderCode, docTotal } }, lucroTotal, date },
+        { upsert: true }
+      )
     }
 
     return res.send({ message: `Order ${orderCode} finished` })
